@@ -11,6 +11,8 @@ def ref = "openshift/3.10/x86_64/os";
 node(env.NODE) {
     checkout scm
 
+    docker.image(DOCKER_IMG).pull()
+
     stage("Provision") {
         sh """
            rpm -q imagefactory-plugins-TinMan \
