@@ -108,4 +108,11 @@ def inside_assembler_container(args, fn) {
     }
 }
 
+def registry_login(username, password, registry) {
+    sh """
+        echo podman login -u ${username} -p '<password>' ${registry}
+        podman login -u ${username} -p "${password}" ${registry}
+    """
+}
+
 return this
