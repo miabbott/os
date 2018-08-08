@@ -33,12 +33,9 @@ node(NODE) {
         def treecompose_workdir = "${WORKSPACE}/treecompose"
         def repo = "${treecompose_workdir}/repo"
 
-        stage("Login") { sh """
-            set +x
-            echo podman login -u ${username} -p '<password>' ${API_CI_REGISTRY}
-            podman login -u "${username}" -p "${password}" ${API_CI_REGISTRY}
-            echo "login done"
-        """ }
+        stage("Login") {
+            utils.registry_login("${username}", "${password}", "${API_CI_REGISTRY}")
+        }
 
         stage("Pull and run oscontainer") { sh """
             rm ${treecompose_workdir} -rf
