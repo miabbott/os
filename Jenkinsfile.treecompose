@@ -96,7 +96,7 @@ node(NODE) {
             def cid = readFile('imgid.txt').trim();
             currentBuild.description = "🆕 ${OSCONTAINER_IMG}@sha256:${cid} (${composeMeta.version})";
             composeMeta["container-sha256"] = "${cid}"
-            writeFile file: "${composeMeta.commit}-compose.json", text: groovy.JsonOutput.toJson(composeMeta);
+            writeFile file: "${composeMeta.commit}-compose.json", text: groovy.json.JsonOutput.toJson(composeMeta);
             sh "cp ${composeMeta.commit}-compose.json compose.json"
             archiveArtifacts artifacts: "*.json"
         }
@@ -115,8 +115,8 @@ node(NODE) {
             def cid = readFile('imgid.txt').trim();
             currentBuild.description = "🆕 ${OSCONTAINER_IMG}@sha256:${cid} (${composeMeta.version})";
             composeMeta["container-sha256"] = "${cid}"
-            writeFile file: "${commit}-compose.json", text: groovy.JsonOutput.toJson(composeMeta);
-            sh "cp ${commit}-compose.json compose.json"
+            writeFile file: "${composeMeta.commit}-compose.json", text: groovy.json.JsonOutput.toJson(composeMeta);
+            sh "cp ${composeMeta.commit}-compose.json compose.json"
             archiveArtifacts artifacts: "*.json"
         }
 
