@@ -106,6 +106,9 @@ node(NODE) {
         """
             def cid = readFile('imgid.txt').trim();
             currentBuild.description = "🆕 ${OSCONTAINER_IMG}@sha256:${cid} (${composeMeta.version})";
+            composeMeta["container-sha256"] = "${cid}"
+            writeFile file: "${commit}-compose.json", text: groovy.JsonOutput.toJson(composeMeta);
+            archiveArtifacts artifacts: "${commit}-compose.json"
         }
 
         stage("rsync out") {
