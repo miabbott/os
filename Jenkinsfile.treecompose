@@ -91,7 +91,15 @@ node(NODE) {
                          --build-arg OS_COMMIT=${composeMeta.commit} \
                          -t ${OSCONTAINER_IMG} \
                          -f ${WORKSPACE}/Dockerfile.rollup ${WORKSPACE}
-        """ }
+            podman inspect --format='{{.Id}}' ${OSCONTAINER_IMG} > imgid.txt
+        """
+            def cid = readFile('imgid.txt').trim();
+            currentBuild.description = "🆕 ${OSCONTAINER_IMG}@sha256:${cid} (${composeMeta.version})";
+            composeMeta["container-sha256"] = "${cid}"
+            writeFile file: "${composeMeta.commit}-compose.json", text: groovy.JsonOutput.toJson(composeMeta);
+            sh "cp ${composeMeta.commit}-compose.json compose.json"
+            archiveArtifacts artifacts: "*.json"
+        }
 
         if (params.DRY_RUN) {
             echo "DRY_RUN set, skipping push"
@@ -108,7 +116,8 @@ node(NODE) {
             currentBuild.description = "🆕 ${OSCONTAINER_IMG}@sha256:${cid} (${composeMeta.version})";
             composeMeta["container-sha256"] = "${cid}"
             writeFile file: "${commit}-compose.json", text: groovy.JsonOutput.toJson(composeMeta);
-            archiveArtifacts artifacts: "${commit}-compose.json"
+            sh "cp ${commit}-compose.json compose.json"
+            archiveArtifacts artifacts: "*.json"
         }
 
         stage("rsync out") {
