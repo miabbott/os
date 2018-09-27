@@ -17,12 +17,13 @@ node(NODE) {
     // This job should only be triggered by Jenkinsfile.cloud
     utils.define_properties(null)
 
-    if (params.DRY_RUN) {
-        echo "DRY_RUN set, skipping aws tests and launch permissions"
-        currentBuild.result = 'NOT_BUILT'
-        currentBuild.description = '(dry run)'
-        return
-    }
+    // TODO: uncomment after test
+    //if (params.DRY_RUN) {
+    //    echo "DRY_RUN set, skipping aws tests and launch permissions"
+    //    currentBuild.result = 'NOT_BUILT'
+    //    currentBuild.description = '(dry run)'
+    //    return
+    //}
 
     // We're only ever triggered by the cloud job, so we know the latest build is in latest/
     // We immediately resolve it back to the specific images/ dir
@@ -69,10 +70,12 @@ node(NODE) {
                     # Do testing with intermediate aws image passed in by cloud job
                     if ! kola -b rhcos -p aws --aws-type t2.small --tapfile rhcos-aws.tap --aws-ami ${ami_intermediate} --aws-region ${AWS_REGION} -j ${NUM_VMS} run; then
                         # if the tests fail, GC the container image tagged with the ostree commit
-                        skopeo delete docker://${OSCONTAINER_IMG}:${ostree_commit}
+                        # TODO: uncomment after test
+                        #skopeo delete docker://${OSCONTAINER_IMG}:${ostree_commit}
                         exit 1
                     fi
 
+                    # TODO: uncomment after test
                     # Tests pass, tag the json in the artifact server to a persistent location
                     # and give launch permissions to OpenShift CI
                     export AWS_DEFAULT_REGION=${AWS_REGION}
@@ -89,8 +92,8 @@ node(NODE) {
                         s3://${S3_PUBLIC_BUCKET}/aws-${AWS_REGION}-tested.json
 
                     # Copy the container image to alpha, then GC the image tagged with the ostree commit
-                    skopeo copy docker://${OSCONTAINER_IMG}:${ostree_commit} docker://${OSCONTAINER_IMG}:alpha
-                    skopeo delete docker://${OSCONTAINER_IMG}:${ostree_commit}
+                    #skopeo copy docker://${OSCONTAINER_IMG}:${ostree_commit} docker://${OSCONTAINER_IMG}:alpha
+                    #skopeo delete docker://${OSCONTAINER_IMG}:${ostree_commit}
                 """
             }
         }
@@ -100,6 +103,13 @@ node(NODE) {
         archiveArtifacts artifacts: "rhcos-aws.tap", allowEmptyArchive: true
     }
 
+    // TODO: remove after test
+    if (params.DRY_RUN) {
+        echo "DRY_RUN set, skipping aws tests and launch permissions"
+        currentBuild.result = 'NOT_BUILT'
+        currentBuild.description = '(dry run)'
+        return
+    }
     stage("rsync out") {
         withCredentials([
             string(credentialsId: params.ARTIFACT_SERVER, variable: 'ARTIFACT_SERVER'),
