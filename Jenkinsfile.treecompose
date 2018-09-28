@@ -112,7 +112,6 @@ node(NODE) {
             podman push ${OSCONTAINER_IMG}:buildmaster
             podman push ${OSCONTAINER_IMG}:${composeMeta.commit}
             skopeo inspect docker://${OSCONTAINER_IMG}:buildmaster | jq '.Digest' > imgid.txt
-            podman inspect --format='{{.Id}}' ${OSCONTAINER_IMG}:buildmaster > imgid.txt
         """
             def cid = readFile('imgid.txt').trim().replaceAll('"','');
             currentBuild.description = "🆕 ${OSCONTAINER_IMG}@${cid} (${composeMeta.version})";
