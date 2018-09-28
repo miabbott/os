@@ -88,10 +88,8 @@ node(NODE) {
                         ${WORKSPACE}/aws-${AWS_REGION}.json \
                         s3://${S3_PUBLIC_BUCKET}/aws-${AWS_REGION}-tested.json
 
-                    # Tag the container image to alpha, then GC the image tagged with the ostree commit
-                    podman pull ${OSCONTAINER_IMG}:${ostree_commit}
-                    podman tag ${OSCONTAINER_IMG}:${ostree_commit} ${OSCONTAINER_IMG}:alpha
-                    podman push ${OSCONTAINER_IMG}:alpha
+                    # Copy the container image to alpha, then GC the image tagged with the ostree commit
+                    skopeo copy docker://${OSCONTAINER_IMG}:${ostree_commit} docker://${OSCONTAINER_IMG}:alpha
                     skopeo delete docker://${OSCONTAINER_IMG}:${ostree_commit}
                 """
             }
