@@ -2,6 +2,7 @@
 set -xeuo pipefail
 
 repo=$1; shift
+cache=$1; shift
 ref=$1; shift
 
 # We don't keep history in the tree.
@@ -9,15 +10,14 @@ previous_commit=$(ostree --repo="${repo}" rev-parse "${ref}" || true)
 rm ${repo}/refs/heads/* -rf
 
 # Generate cache directory
-cachedir=${WORKSPACE}/rpmostree-cache
-mkdir -p ${cachedir}
-build_repo=${cachedir}/build-repo
+mkdir -p ${cache}
+build_repo=${cache}/build-repo
 ostree --repo=${build_repo} init --mode=bare-user
 
 # This should be the default.  It'll help us trace down a
 # coredump we're seeing periodically.
 export G_DEBUG=fatal-warnings
-rpm-ostree compose tree --repo=${build_repo} --cachedir=$WORKSPACE/rpmostree-cache "$@"
+rpm-ostree compose tree --repo=${build_repo} --cachedir=${cache} "$@"
 commit=$(ostree --repo=${build_repo} rev-parse ${ref})
 ostree --repo=${repo} pull-local ${build_repo}
 version=$(ostree --repo=${repo} show --print-metadata-key=version ${commit} | sed -e "s,',,g")
