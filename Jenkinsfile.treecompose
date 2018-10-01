@@ -27,6 +27,7 @@ node(NODE) {
     utils.inside_assembler_container("") {
         def treecompose_workdir = "${WORKSPACE}/treecompose";
         def repo = "${treecompose_workdir}/repo";
+        def cachedir = "${treecompose_workdir}/rpmostree-cache";
 
         stage("Prepare configuration") {
             utils.prepare_configuration();
@@ -49,7 +50,8 @@ node(NODE) {
 
         def last_build_version, force_nocache
         stage("Check for Changes") { sh """
-            rpm-ostree compose tree --dry-run --repo=${repo} --touch-if-changed=$WORKSPACE/build.stamp ${manifest}
+            mkdir -p ${cachedir}
+            rpm-ostree compose tree --dry-run --repo=${repo} --cachedir=${cachedir} --touch-if-changed=${WORKSPACE}/build.stamp ${manifest}
         """
             last_build_version = utils.get_rev_version(repo, ref)
             if (fileExists('force-nocache-build')) {
@@ -70,7 +72,7 @@ node(NODE) {
         def composeMeta;
         try {
             stage("Compose Tree") {
-                sh """./scripts/run-treecompose ${repo} ${ref} ${manifest} ${COMPOSEFLAGS} --add-metadata-string=version=${version_prefix}.${env.BUILD_NUMBER}"""
+                sh """./scripts/run-treecompose ${repo} ${cachedir} ${ref} ${manifest} ${COMPOSEFLAGS} --add-metadata-string=version=${version_prefix}.${env.BUILD_NUMBER}"""
                 composeMeta = readJSON file: "compose.json"
                 currentBuild.description = "🆕 ${composeMeta.version} (commit ${composeMeta.commit})";
             }
