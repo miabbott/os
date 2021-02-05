@@ -42,3 +42,17 @@ extensions:
       - kernel-rt-modules
       - kernel-rt-modules-extra
       - kernel-rt-devel
+  # https://github.com/openshift/machine-config-operator/pull/2376/
+  # GRPA-3123
+  qemu-kiwi:
+    architectures:
+      - x86_64
+    packages:
+      - qemu-kiwi
+      - ipxe-roms-qemu
+      - libpmem
+      - pixman
+      - qemu-kvm-common
+      - seabios-bin
+      - seavgabios-bin
+      - sgabios-bin
