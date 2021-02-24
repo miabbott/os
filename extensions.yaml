@@ -3,6 +3,7 @@
 # and https://github.com/coreos/fedora-coreos-tracker/issues/401
 
 repos:
+  - rhel-8-advanced-virt
   - rhel-8-nfv
 
 extensions:
@@ -49,10 +50,3 @@ extensions:
       - x86_64
     packages:
       - qemu-kiwi
-      - ipxe-roms-qemu
-      - libpmem
-      - pixman
-      - qemu-kvm-common
-      - seabios-bin
-      - seavgabios-bin
-      - sgabios-bin
